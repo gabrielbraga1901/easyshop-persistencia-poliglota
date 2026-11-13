@@ -1,132 +1,82 @@
-# EasyShop – Mini E-commerce com Persistência Poliglota
+# EasyShop
+**Integrantes:** - Gabriel Braga - Gustavo Ayres
+**EasyShop** é um aplicativo de comércio eletrônico desenvolvido com C# e .NET MAUI, projetado para demonstrar uma abordagem flexível e eficiente de armazenamento de dados por meio de uma arquitetura de persistência poliglota.
 
-**Integrantes:**
-- Gabriel Braga
-- Gustavo Ayres
+O projeto utiliza dois bancos de dados locais, cada um responsável por armazenar o tipo de informação para o qual é mais adequado.
 
-## 1. Sobre o projeto
+## Tecnologias utilizadas
 
-O EasyShop é um protótipo de aplicativo Android desenvolvido em C# com .NET MAUI. Ele demonstra o uso simultâneo de dois paradigmas de persistência local no mesmo aplicativo:
+- **C#** – Linguagem principal de desenvolvimento.
+- **.NET MAUI** – Framework utilizado para construção da interface multiplataforma.
+- **SQLite** – Banco de dados relacional utilizado para armazenar informações dos clientes.
+- **LiteDB** – Banco de dados NoSQL orientado a documentos, utilizado para armazenar o catálogo de produtos.
 
-- **LiteDB (NoSQL orientado a documentos):** armazena o catálogo de produtos. Cada produto possui nome, preço, categoria opcional e um dicionário de atributos dinâmicos. Assim, um notebook pode ter `Processador` e `Memória RAM`, enquanto uma camisa pode ter `Tamanho` e `Cor`, sem alterar a estrutura do banco.
-- **SQLite (SQL relacional):** armazena clientes em uma tabela estruturada com identificador, nome completo e e-mail. O identificador é chave primária autoincremental e o e-mail possui restrição de unicidade.
+## Funcionalidades
 
-Os dois bancos são arquivos locais independentes, salvos no diretório privado do aplicativo Android.
+### Catálogo de produtos
 
-## 2. Arquitetura em camadas
+O gerenciamento de produtos utiliza o LiteDB, permitindo armazenar informações com estruturas flexíveis e atributos personalizados.
 
-```text
-EasyShop/
-├── Models/                 # Entidades Product e Customer
-├── Data/Repositories/      # Contratos e implementação dos bancos
-├── Services/               # Validações e regras de negócio
-├── ViewModels/             # Estado da tela e comandos
-├── Views/                  # Telas XAML e code-behind
-├── App.xaml                 # Estilos globais
-├── AppShell.xaml            # Navegação por abas
-├── MauiProgram.cs           # Injeção de dependência
-└── README.md
-```
+Principais funcionalidades:
+- Cadastro de produtos com nome e preço.
+- Definição de categorias.
+- Inclusão de atributos dinâmicos, como cor, tamanho, voltagem e especificações.
+- Listagem dos produtos cadastrados.
 
-Fluxo das operações:
+### Cadastro de clientes
 
-```text
-Apresentação (Views + ViewModels)
-              ↓
-       Negócio (Services)
-              ↓
-    Acesso a dados (Repositories)
-          ↙         ↘
-       LiteDB       SQLite
-       Produtos     Clientes
-```
+O gerenciamento de clientes utiliza o SQLite, garantindo uma estrutura organizada e consistente para os dados cadastrais.
 
-A interface não acessa os bancos diretamente. Os ViewModels chamam os serviços; os serviços validam os dados e usam as interfaces dos repositórios; os repositórios realizam o CRUD/persistência.
+Principais funcionalidades:
+- Cadastro de clientes.
+- Armazenamento de nome completo e e-mail.
+- Validação dos dados informados.
+- Listagem dos clientes cadastrados.
 
-## 3. Tecnologias e pacotes
+## Arquitetura do projeto
 
-- .NET MAUI / C# / XAML
-- LiteDB 5.0.21
-- sqlite-net-pcl 1.9.172
-- Injeção de dependência nativa do .NET MAUI
+O EasyShop utiliza uma arquitetura em camadas para manter o código organizado, facilitar a manutenção e separar as responsabilidades da aplicação.
 
-## 4. Requisitos para executar
+- **Presentation:** responsável pela interface, telas e interação com o usuário.
+- **Services:** concentra a lógica de negócio e coordena as operações da aplicação.
+- **Data:** responsável pelo acesso aos bancos de dados e pelas operações de persistência.
+- **Models:** define as estruturas de dados utilizadas pelo sistema.
 
-- Windows 10/11 64 bits.
-- Visual Studio 2026 com a carga de trabalho **Desenvolvimento de interface do usuário de aplicativo multiplataforma do .NET** instalada.
-- .NET SDK compatível com `net10.0-android`.
-- Componentes Android SDK e OpenJDK instalados pelo Visual Studio Installer.
-- Emulador Android criado no Android Device Manager ou dispositivo Android com depuração USB habilitada.
+Essa organização reduz o acoplamento entre os componentes e facilita futuras evoluções do projeto.
 
-## 5. Como abrir e executar
+## Persistência poliglota
 
-1. Baixe ou clone este repositório.
-2. Abra `EasyShop.csproj` no Visual Studio 2026.
-3. Aguarde a restauração dos pacotes NuGet.
-4. Abra o Android Device Manager e inicie um emulador, ou conecte um aparelho Android.
-5. Na lista de destinos de execução, selecione o emulador/dispositivo Android.
-6. Pressione **F5** (ou clique em Iniciar Depuração).
+Um dos principais conceitos aplicados no EasyShop é a utilização simultânea de diferentes paradigmas de armazenamento.
 
-Pela linha de comando, com o ambiente MAUI Android instalado:
+Cada banco possui uma responsabilidade específica:
 
-```bash
-dotnet workload restore
-dotnet restore EasyShop.csproj
-dotnet build EasyShop.csproj -f net10.0-android
-dotnet build EasyShop.csproj -t:Run -f net10.0-android
-```
+| Banco de dados | Responsabilidade |
+|---|---|
+| LiteDB | Armazenamento do catálogo de produtos |
+| SQLite | Armazenamento dos clientes |
 
-Se o Visual Studio oferecer outro Target Framework MAUI compatível com o SDK instalado, ajuste `TargetFrameworks` no `.csproj` para o TFM Android correspondente disponível no seu ambiente.
+Essa divisão permite aproveitar a flexibilidade do NoSQL para informações dinâmicas e a consistência do modelo relacional para dados estruturados.
 
-## 6. Como testar a demonstração
+## Execução do projeto
 
-### Aba Produtos – LiteDB (NoSQL)
+Para executar o EasyShop, é necessário ter instalado:
 
-1. Abra a aba **Produtos**.
-2. Cadastre, por exemplo:
-   - Nome: Notebook Pro
-   - Preço: 4599,90
-   - Categoria: Informática
-   - Atributos: `Processador: Intel Core i7; Memória RAM: 16 GB; Armazenamento: 512 GB SSD`
-3. Cadastre outro tipo de produto com atributos diferentes, por exemplo:
-   - Nome: Camiseta básica
-   - Preço: 59,90
-   - Categoria: Vestuário
-   - Atributos: `Tamanho: M; Cor: Azul`
-4. Confira que os produtos aparecem na listagem com suas características próprias.
-5. Feche e abra o aplicativo novamente para demonstrar que os registros permanecem salvos localmente.
+- Visual Studio com suporte ao desenvolvimento .NET MAUI.
+- SDK do .NET compatível com o projeto.
+- Android SDK e ferramentas de desenvolvimento Android.
+- Emulador Android ou dispositivo físico compatível.
 
-### Aba Clientes – SQLite (SQL)
+**Passos para execução:**
 
-1. Abra a aba **Clientes**.
-2. Cadastre um nome completo e um e-mail válido, por exemplo `Ana Souza` e `ana@exemplo.com`.
-3. Confira o cliente na listagem e seu identificador.
-4. Tente cadastrar novamente o mesmo e-mail para demonstrar a restrição de unicidade do banco.
-5. Feche e abra o aplicativo novamente para verificar a persistência.
+1. Clone este repositório.
+2. Abra o arquivo `EasyShop.csproj` no Visual Studio.
+3. Aguarde a restauração das dependências NuGet.
+4. Configure ou inicie um emulador Android.
+5. Selecione o dispositivo como destino de execução.
+6. Execute o projeto utilizando o Visual Studio.
 
-> Os exemplos acima são dados fictícios para demonstração.
+Os bancos de dados são armazenados localmente no dispositivo, dentro do diretório de dados da aplicação.
 
-## 7. Arquivos de banco
+---
 
-Os bancos são criados automaticamente na primeira utilização:
-
-- `products.db` – arquivo do LiteDB, coleção `products`.
-- `customers.db3` – arquivo SQLite, tabela `Customers`.
-
-No Android, os arquivos ficam em `FileSystem.AppDataDirectory`, dentro do armazenamento privado do aplicativo. Não é necessário configurar servidor ou conexão com a internet.
-
-## 8. Observações e escopo
-
-O protótipo implementa cadastro e listagem (Create e Read) para os dois tipos de registro, além de validações de entrada. Atualização e exclusão não fazem parte dos requisitos mínimos descritos na atividade. O banco NoSQL é utilizado somente para produtos e o banco relacional somente para clientes, deixando explícita a separação das responsabilidades.
-
-## 9. Roteiro sugerido para o vídeo
-
-1. Apresentar o nome do projeto e os integrantes.
-2. Mostrar a aba Produtos e cadastrar produtos com atributos diferentes.
-3. Explicar que os produtos são documentos flexíveis no LiteDB.
-4. Mostrar a aba Clientes e cadastrar um cliente.
-5. Explicar que clientes são registros relacionais no SQLite, com chave primária e e-mail único.
-6. Fechar e reabrir o aplicativo para comprovar a persistência local.
-7. Mostrar rapidamente a estrutura em camadas do código.
-
-**Importante:** o vídeo deve ser gravado no emulador Android ou dispositivo Android, com áudio explicativo ou legendas claras, conforme a atividade.
+**EasyShop** — Uma aplicação que combina flexibilidade, organização e diferentes tecnologias de persistência em uma única solução.
