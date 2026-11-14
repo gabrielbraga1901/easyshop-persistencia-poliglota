@@ -1,5 +1,5 @@
 # EasyShop
-**Integrantes:** - Gabriel Braga - Gustavo Ayres
+**Integrantes:** - Gabriel Braga - Gustavo Ayres - Daniel Stabile
 
 
 **EasyShop** é um aplicativo de comércio eletrônico desenvolvido com C# e .NET MAUI, projetado para demonstrar uma abordagem flexível e eficiente de armazenamento de dados por meio de uma arquitetura de persistência poliglota.
